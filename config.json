@@ -1,0 +1,167 @@
+{
+  "$schema": "https://www.krakend.io/schema/v2.6/krakend.json",
+  "version": 3,
+  "endpoints": [
+    {
+      "@comment": "Collections, return response like as consumed. Check 'output_encoding' and 'is_collection' tags.",
+      "endpoint": "/v1/users",
+      "method": "GET",
+      "output_encoding": "json-collection",
+      "backend": [
+        {
+          "url_pattern": "/users",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "is_collection": true
+        }
+      ]
+    },
+    {
+      "@comment": "Single, return single response by path variable. Check '{id}' variable.",
+      "endpoint": "/v1/users/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/users/{id}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ]
+        }
+      ]
+    },
+    {
+      "@coment": "Send only query parameters allowed to backend. Check 'input_query_strings' tag.",
+      "endpoint": "/v1/products",
+      "method": "GET",
+      "output_encoding": "json-collection",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/products",
+          "method": "GET",
+          "host": [
+            "https://api.escuelajs.co"
+          ],
+          "is_collection": true
+        }
+      ],
+      "input_query_strings": [
+        "offset",
+        "limit",
+        "sort",
+        "title",
+        "categoryId"
+      ]
+    },
+    {
+      "@comment": "Filter, selector and mapping results by unique response. Check 'target', 'allow' and 'mapping' tags.",
+      "endpoint": "/v1/users/{id}/address",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/users/{id}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "target": "address",
+          "allow": ["street", "city", "zipcode"],
+          "mapping": {
+            "address.street": "street",
+            "address.city": "city",
+            "address.zipcode": "zipcode"
+          }
+        }
+      ]
+    },
+    {
+      "@comment": "Combine results from 2 APIS. Check 'backend' and 'group' (optional) tags.",
+      "endpoint": "/v1/albums/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/albums/{id}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "group": "album"
+        },
+        {
+          "url_pattern": "/posts/{id}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "group": "post"
+        }
+      ]
+    },
+    {
+      "@comment": "Merge and group multiple APIS in sequential mode.",
+      "endpoint": "/v1/comments/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "@commnet": "First API for get comments by id. This is the index 0.",
+          "url_pattern": "/comments/{id}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "group": "comment"
+        },
+        {
+          "@comment": "Second API for get posts by id. This is the index 1.",
+          "url_pattern": "/posts/{resp0_comment.postId}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "group": "post"
+        },
+        {
+          "@comment": "Third API for get users by id. This is the index 2.",
+          "url_pattern": "/users/{resp1_post.userId}",
+          "method": "GET",
+          "host": [
+            "https://jsonplaceholder.typicode.com"
+          ],
+          "group": "user"
+        }
+      ],
+      "extra_config": {
+        "proxy": {
+          "sequential": true
+        }
+      }
+    },
+    {
+      "@comment": "Publish message in kafka topic",
+      "endpoint": "/v1/kafka",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "host": ["kafka://"],
+          "url_pattern": "",
+          "disable_host_sanitize": true,
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/pubsub/publisher": {
+              "topic_url": "messages"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "extra_config": {
+    "router": {
+      "@comment": "Custom config router, eg: disable response header KrakenD version.",
+      "hide_version_header": true
+    }
+  }
+}

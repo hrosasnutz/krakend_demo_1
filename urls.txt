@@ -1,0 +1,6 @@
+http://localhost:8080/v1/users
+http://localhost:8080/v1/users/1
+http://localhost:8080/v1/users/1/address
+http://localhost:8080/v1/albums/1
+http://localhost:8080/v1/comments/1
+http://localhost:8080/v1/products?offset=0&limit=10&categoryId=1
