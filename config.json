@@ -56,6 +56,30 @@
       ]
     },
     {
+      "@comment": "Flatten response. Check 'flatmap_filter' tag.",
+      "endpoint": "/v1/products/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/products/{id}",
+          "method": "GET",
+          "host": [
+            "https://api.escuelajs.co"
+          ],
+          "extra_config" : {
+            "proxy": {
+              "flatmap_filter": [
+                { "type": "move", "args": ["category.id","category_id"] },
+                { "type": "move", "args": ["category.name","category_name"] },
+                { "type": "move", "args": ["category.image","category_image"] },
+                { "type": "del", "args": ["category"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "@comment": "Filter, selector and mapping results by unique response. Check 'target', 'allow' and 'mapping' tags.",
       "endpoint": "/v1/users/{id}/address",
       "method": "GET",
