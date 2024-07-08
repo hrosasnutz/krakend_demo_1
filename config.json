@@ -33,7 +33,7 @@
       ]
     },
     {
-      "@coment": "Send only query parameters allowed to backend. Check 'input_query_strings' tag.",
+      "@comment": "Send only query parameters allowed to backend. Check 'input_query_strings' tag.",
       "endpoint": "/v1/products",
       "method": "GET",
       "output_encoding": "json-collection",
